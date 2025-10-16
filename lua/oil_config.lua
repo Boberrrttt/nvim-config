@@ -4,6 +4,9 @@ local function join_paths(...)
 end
 
 require("oil").setup({
+  view_options = {
+    show_hidden = true,
+  },
   columns = {
     "icon", "size", "permissions", "mtime", "type",
   },

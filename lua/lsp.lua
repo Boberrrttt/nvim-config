@@ -48,7 +48,7 @@ vim.api.nvim_create_autocmd("FileType", {
       cmd = {
         "cmd.exe",
         "/c",
-        "C:\\Users\\QRF_1\\AppData\\Roaming\\npm\\typescript-language-server.cmd",
+        "C:\\Users\\User\\AppData\\Roaming\\npm\\typescript-language-server.cmd",
         "--stdio",
       },
       root_dir = get_root_dir(args.file),
@@ -68,7 +68,7 @@ vim.api.nvim_create_autocmd("FileType", {
     local python_path = venv and (venv .. "\\Scripts\\python.exe") or "python"
 
     -- Windows full path to pyright-langserver.cmd
-    local pyright_cmd = "C:\\Users\\QRF_1\\AppData\\Roaming\\npm\\pyright-langserver.cmd"
+    local pyright_cmd = "C:\\Users\\User\\AppData\\Roaming\\npm\\pyright-langserver.cmd"
 
     vim.lsp.start({
       name = "pyright",
