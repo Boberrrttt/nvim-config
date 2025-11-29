@@ -1,7 +1,6 @@
 local map = vim.keymap.set
 
--- Oil + Telescope
-map("n", "<leader>e", ":Oil<CR>", { noremap = true, silent = true })
+-- Telescope
 map("n", "<C-p>", "<cmd>Telescope find_files<CR>", { noremap = true, silent = true })
 map("n", "<leader>f", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true })
 map("n", "<leader>r", "<cmd>Telescope oldfiles<CR>", { noremap = true, silent = true })
@@ -30,19 +29,20 @@ map("n", "<C-x>", '"+dd', { noremap = true, silent = true })
 map("n", "<C-v>", '"+p', { noremap = true, silent = true })
 map("i", "<C-v>", '<C-r>+', { noremap = true, silent = true })
 
--- Buffer nav
+-- Buffer navigation
 map("n", "<TAB>", ":bnext<CR>", { noremap = true, silent = true })
 map("n", "<S-TAB>", ":bprevious<CR>", { noremap = true, silent = true })
 map("n", "<leader>q", ":Bdelete<CR>", { noremap = true, silent = true })
+
+-- Neo-tree (file explorer)
+map("n", "<leader>e", ":Neotree toggle left<CR>", { noremap = true, silent = true, desc = "Toggle file explorer" })
 
 -- Ctrl+Shift+F → Search text in project
 map("n", "<C-S-f>", function()
   require("telescope.builtin").live_grep()
 end, { noremap = true, silent = true, desc = "Search in project" })
 
---  open a brand new floating terminal
-vim.keymap.set("n", "<leader>n", function()
-  require("toggleterm.terminal").Terminal
-    :new({ direction = "float" })
-    :toggle()
+-- Open new floating terminal
+map("n", "<leader>n", function()
+  require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })

@@ -10,9 +10,6 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
-  -- File explorer replacement (Oil.nvim)
-  { "stevearc/oil.nvim" },
-
   -- Status line
   { "nvim-lualine/lualine.nvim" },
 
@@ -66,4 +63,15 @@ require("lazy").setup({
   -- Git
   { "lewis6991/gitsigns.nvim" },
   { "tpope/vim-fugitive" },
+
+  -- Neo-tree (VSCode-like sidebar)
+  {
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons",
+      "MunifTanjim/nui.nvim",
+    }
+  }
 })

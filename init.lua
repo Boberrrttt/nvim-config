@@ -16,8 +16,8 @@ require("telescope_config")
 -- Debugger
 require("dap_config")
 
--- Oil (file explorer)
-require("oil_config")
+-- File explorer
+require("neo_tree_config")
 
 
 require("toggleterm_config")

@@ -5,6 +5,6 @@ require("toggleterm").setup {
   float_opts = {
     border = "curved",
     width = 150,   
-    height = 50,   
+    height = 40,   
   },
 }
