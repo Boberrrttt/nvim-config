@@ -22,4 +22,12 @@ require("neo_tree_config")
 
 require("toggleterm_config")
 
+
 require("theme")
+
+vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
+  callback = function()
+    local ok, gitsigns = pcall(require, "gitsigns")
+    if ok then gitsigns.refresh() end
+  end,
+})

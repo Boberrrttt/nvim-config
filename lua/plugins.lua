@@ -64,14 +64,51 @@ require("lazy").setup({
   { "lewis6991/gitsigns.nvim" },
   { "tpope/vim-fugitive" },
 
-  -- Neo-tree (VSCode-like sidebar)
+  -- Icons: devicons + material icons
+  {
+    "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("nvim-web-devicons").setup({
+        default = true,      -- enable fallback icons
+        color_icons = true,  -- colored icons
+      })
+    end,
+  },
+
+  {
+    "DaikyXendo/nvim-material-icon",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    config = function()
+      -- Reload devicons after material icon plugin applies
+      require("nvim-web-devicons").setup({
+        default = true,
+        color_icons = true,
+      })
+    end,
+  },
+
+  -- Neo-tree (depends on devicons + material icons)
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
+      "DaikyXendo/nvim-material-icon",
       "MunifTanjim/nui.nvim",
-    }
-  }
+    },
+    config = function()
+      require("neo-tree").setup({
+        default_component_configs = {
+          icon = {
+            folder_closed = "",
+            folder_open = "",
+            folder_empty = "",
+            default = "",
+          },
+        },
+      })
+    end,
+  },
+
 })
