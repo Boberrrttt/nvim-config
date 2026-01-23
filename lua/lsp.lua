@@ -89,11 +89,36 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Diagnostics
 -- =====================
 vim.diagnostic.config({
-  virtual_text = { prefix = "●" },
+  virtual_text = true, 
   signs = true,
   underline = true,
   update_in_insert = true,
+  float = {
+    border = "rounded", 
+    source = "always", 
+    header = "",
+    prefix = "",
+  },
 })
+
+function CopyLineDiagnostics()
+  local bufnr = 0
+  local lnum = vim.fn.line('.') - 1
+  local diags = vim.diagnostic.get(bufnr, { lnum = lnum })
+  
+  if #diags == 0 then
+    print("No diagnostics on this line")
+    return
+  end
+
+  local messages = {}
+  for _, d in ipairs(diags) do
+    table.insert(messages, d.message)
+  end
+
+  vim.fn.setreg('+', table.concat(messages, '\n'))  -- copy to system clipboard
+  print("Diagnostics copied to clipboard!")
+end
 
 local signs = { Error = " ", Warn = " ", Hint = "󰌵 ", Info = " " }
 for type, icon in pairs(signs) do

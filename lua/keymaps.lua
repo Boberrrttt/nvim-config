@@ -46,3 +46,18 @@ end, { noremap = true, silent = true, desc = "Search in project" })
 map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })
+
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>e",  
+  "<cmd>lua vim.diagnostic.open_float()<CR>",
+  { noremap = true, silent = true }
+)
+
+vim.api.nvim_set_keymap(
+  "n",
+  "<leader>y",              
+  "<cmd>lua CopyLineDiagnostics()<CR>",
+  { noremap = true, silent = true }
+)
+

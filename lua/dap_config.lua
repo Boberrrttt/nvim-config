@@ -15,3 +15,15 @@ vim.keymap.set("n", "<F12>", function() dap.step_out() end, { desc = "DAP Step O
 vim.keymap.set("n", "<leader>db", function() dap.toggle_breakpoint() end, { desc = "DAP Toggle Breakpoint" })
 vim.keymap.set("n", "<leader>dr", function() dap.repl.open() end, { desc = "DAP REPL" })
 vim.keymap.set("n", "<leader>dl", function() dap.run_last() end, { desc = "DAP Run Last" })
+
+dap.listeners.after.event_stopped["open_repl"] = function(session, body)
+  dap.repl.open()
+end
+
+dap.listeners.after.event_terminated["notify_error"] = function(session, body)
+  vim.schedule(function()
+    local msg = "Debugger session terminated.\nDetails: " .. vim.inspect(body)
+    vim.notify(msg, vim.log.levels.WARN)
+  end)
+end
+
