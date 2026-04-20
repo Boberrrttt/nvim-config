@@ -16,9 +16,7 @@ require("telescope_config")
 -- Debugger
 require("dap_config")
 
--- File explorer
-require("neo_tree_config")
-
+-- File explorer: configured from lazy.nvim (neo-tree plugin `config`)
 
 require("toggleterm_config")
 

@@ -79,7 +79,6 @@ require("lazy").setup({
     "DaikyXendo/nvim-material-icon",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
-      -- Reload devicons after material icon plugin applies
       require("nvim-web-devicons").setup({
         default = true,
         color_icons = true,
@@ -91,6 +90,7 @@ require("lazy").setup({
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "v3.x",
+    lazy = false,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-tree/nvim-web-devicons",
@@ -98,16 +98,7 @@ require("lazy").setup({
       "MunifTanjim/nui.nvim",
     },
     config = function()
-      require("neo-tree").setup({
-        default_component_configs = {
-          icon = {
-            folder_closed = "",
-            folder_open = "",
-            folder_empty = "",
-            default = "",
-          },
-        },
-      })
+      require("neo_tree_config")
     end,
   },
 

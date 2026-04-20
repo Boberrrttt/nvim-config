@@ -1,5 +1,5 @@
 require("toggleterm").setup {
-  open_mapping = [[<c-\>]],
+  -- <C-\> alone is not mapped here; use <C-\>1 .. <C-\>9 in keymaps.lua so each digit is a separate terminal.
   start_in_insert = true,
   insert_mappings = true,
   terminal_mappings = true,

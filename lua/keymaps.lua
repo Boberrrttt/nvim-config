@@ -42,7 +42,17 @@ map("n", "<C-S-f>", function()
   require("telescope.builtin").live_grep()
 end, { noremap = true, silent = true, desc = "Search in project" })
 
--- Open new floating terminal
+-- Toggleterm: Ctrl+\ then 1–9 toggles that terminal index (same float layout as toggleterm_config)
+for i = 1, 9 do
+  map(
+    { "n", "t" },
+    "<C-\\>" .. tostring(i),
+    "<cmd>" .. i .. "ToggleTerm direction=float<CR>",
+    { noremap = true, silent = true, desc = "Toggle floating terminal " .. i }
+  )
+end
+
+-- Open new floating terminal (extra instance; does not use the 1–9 slots)
 map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })
