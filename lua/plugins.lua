@@ -13,6 +13,13 @@ require("lazy").setup({
   -- Status line
   { "nvim-lualine/lualine.nvim" },
 
+  -- Buffer tabs (VS Code–style tab bar)
+  {
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+  },
+
   { "tpope/vim-eunuch" },
 
   -- Syntax highlighting & code parsing
@@ -27,7 +34,8 @@ require("lazy").setup({
   { "onsails/lspkind-nvim" },
 
   -- LSP
-  { "neovim/nvim-lspconfig" },
+  -- Load early so bundled `lsp/*.lua` configs merge with `vim.lsp.config()` (Nvim 0.11+)
+  { "neovim/nvim-lspconfig", lazy = false },
 
   -- Terminal
   { "akinsho/toggleterm.nvim", version = "*", config = true },
@@ -102,4 +110,12 @@ require("lazy").setup({
     end,
   },
 
+}, {
+  ui = {
+    border = "rounded",
+    -- string required (not boolean); nil also valid
+    title = " lazy.nvim ",
+    title_pos = "center",
+    backdrop = 60,
+  },
 })

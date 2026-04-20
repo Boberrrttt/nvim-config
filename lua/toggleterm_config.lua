@@ -16,9 +16,9 @@ require("toggleterm").setup {
   },
 
   highlights = {
-    Normal = { guibg = "#1e1e2e" },
-    NormalFloat = { guibg = "#1e1e2e" },
-    FloatBorder = { guifg = "#89b4fa", guibg = "#1e1e2e" },
+    Normal = { guibg = "#12171f" },
+    NormalFloat = { guibg = "#12171f" },
+    FloatBorder = { guifg = "#3EB489", guibg = "#12171f" },
   },
 
   on_open = function(term)

@@ -6,6 +6,16 @@ local lspkind = require("lspkind")
 cmp.setup({
   snippet = { expand = function(args) luasnip.lsp_expand(args.body) end },
   formatting = { format = lspkind.cmp_format({ with_text = true, maxwidth = 50 }) },
+  window = {
+    completion = cmp.config.window.bordered({
+      border = "rounded",
+      winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder,CursorLine:PmenuSel,Search:None",
+    }),
+    documentation = cmp.config.window.bordered({
+      border = "rounded",
+      winhighlight = "Normal:NormalFloat,FloatBorder:FloatBorder",
+    }),
+  },
   mapping = cmp.mapping.preset.insert({
     ["<C-Space>"] = cmp.mapping.complete(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }),

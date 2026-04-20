@@ -29,13 +29,29 @@ map("n", "<C-x>", '"+dd', { noremap = true, silent = true })
 map("n", "<C-v>", '"+p', { noremap = true, silent = true })
 map("i", "<C-v>", '<C-r>+', { noremap = true, silent = true })
 
--- Buffer navigation
-map("n", "<TAB>", ":bnext<CR>", { noremap = true, silent = true })
-map("n", "<S-TAB>", ":bprevious<CR>", { noremap = true, silent = true })
+-- Buffer tabs (bufferline order — matches tab bar, not raw :bnext order)
+map("n", "<TAB>", "<cmd>BufferLineCycleNext<CR>", { noremap = true, silent = true, desc = "Next tab" })
+map("n", "<S-TAB>", "<cmd>BufferLineCyclePrev<CR>", { noremap = true, silent = true, desc = "Previous tab" })
+map("n", "<leader>0", "<cmd>BufferLineGoToBuffer -1<CR>", { noremap = true, silent = true, desc = "Last tab" })
+for i = 1, 9 do
+  map(
+    "n",
+    "<leader>" .. i,
+    "<cmd>BufferLineGoToBuffer " .. i .. "<CR>",
+    { noremap = true, silent = true, desc = "Go to tab " .. i }
+  )
+end
 map("n", "<leader>q", ":Bdelete<CR>", { noremap = true, silent = true })
 
--- Neo-tree (file explorer)
+-- Neo-tree (file explorer) — <leader>e = explorer only (no duplicate binding)
 map("n", "<leader>e", ":Neotree toggle left<CR>", { noremap = true, silent = true, desc = "Toggle file explorer" })
+map("n", "<leader>df", function()
+  vim.diagnostic.open_float()
+end, { noremap = true, silent = true, desc = "Diagnostic float (line)" })
+map("n", "<leader>y", function()
+  CopyLineDiagnostics()
+end, { noremap = true, silent = true, desc = "Yank line diagnostics" })
+
 
 -- Ctrl+Shift+F → Search text in project
 map("n", "<C-S-f>", function()
@@ -56,18 +72,3 @@ end
 map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })
-
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>e",  
-  "<cmd>lua vim.diagnostic.open_float()<CR>",
-  { noremap = true, silent = true }
-)
-
-vim.api.nvim_set_keymap(
-  "n",
-  "<leader>y",              
-  "<cmd>lua CopyLineDiagnostics()<CR>",
-  { noremap = true, silent = true }
-)
-

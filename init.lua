@@ -5,13 +5,11 @@ require("plugins")
 require("options")
 require("keymaps")
 
--- LSP & autocompletion
+-- LSP & autocompletion (LSP after theme so diagnostics highlights / config apply last)
 require("completion")
-require("lsp")
 
 -- Telescope
 require("telescope_config")
-
 
 -- Debugger
 require("dap_config")
@@ -20,8 +18,8 @@ require("dap_config")
 
 require("toggleterm_config")
 
-
 require("theme")
+require("lsp")
 
 vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
   callback = function()
