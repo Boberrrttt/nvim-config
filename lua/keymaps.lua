@@ -41,7 +41,7 @@ for i = 1, 9 do
     { noremap = true, silent = true, desc = "Go to tab " .. i }
   )
 end
-map("n", "<leader>q", ":Bdelete<CR>", { noremap = true, silent = true })
+map("n", "<leader>q", "<cmd>BDelete this<CR>", { noremap = true, silent = true, desc = "Close tab" })
 
 -- Undo tree
 map("n", "<leader>u", "<cmd>UndotreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle undo tree" })
