@@ -48,7 +48,7 @@ vim.api.nvim_create_autocmd("FileType", {
       cmd = {
         "cmd.exe",
         "/c",
-        "C:\\Users\\User\\AppData\\Roaming\\npm\\typescript-language-server.cmd",
+        "C:\\Users\\robert\\AppData\\Roaming\\npm\\typescript-language-server.cmd",
         "--stdio",
       },
       root_dir = get_root_dir(args.file),
@@ -68,7 +68,7 @@ vim.api.nvim_create_autocmd("FileType", {
     local python_path = venv and (venv .. "\\Scripts\\python.exe") or "python"
 
     -- Windows full path to pyright-langserver.cmd
-    local pyright_cmd = "C:\\Users\\User\\AppData\\Roaming\\npm\\pyright-langserver.cmd"
+    local pyright_cmd = "C:\\Users\\robert\\AppData\\Roaming\\npm\\pyright-langserver.cmd"
 
     vim.lsp.start({
       name = "pyright",
@@ -89,13 +89,13 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Diagnostics
 -- =====================
 vim.diagnostic.config({
-  virtual_text = true, 
+  virtual_text = true,
   signs = true,
   underline = true,
   update_in_insert = true,
   float = {
-    border = "rounded", 
-    source = "always", 
+    border = "rounded",
+    source = "always",
     header = "",
     prefix = "",
   },
@@ -105,7 +105,7 @@ function CopyLineDiagnostics()
   local bufnr = 0
   local lnum = vim.fn.line('.') - 1
   local diags = vim.diagnostic.get(bufnr, { lnum = lnum })
-  
+
   if #diags == 0 then
     print("No diagnostics on this line")
     return
@@ -116,24 +116,54 @@ function CopyLineDiagnostics()
     table.insert(messages, d.message)
   end
 
-  vim.fn.setreg('+', table.concat(messages, '\n'))  -- copy to system clipboard
+  vim.fn.setreg('+', table.concat(messages, '\n'))
   print("Diagnostics copied to clipboard!")
 end
 
-local signs = { Error = " ", Warn = " ", Hint = "󰌵 ", Info = " " }
-for type, icon in pairs(signs) do
-  vim.fn.sign_define("DiagnosticSign" .. type, { text = icon, texthl = "DiagnosticSign" .. type })
-end
+-- Line background for error/warn lines
+vim.api.nvim_set_hl(0, "DiagnosticLineError", { bg = "#3D1515" })
+vim.api.nvim_set_hl(0, "DiagnosticLineWarn",  { bg = "#2E2612" })
+
+vim.fn.sign_define("DiagnosticSignError", {
+  text = " ", texthl = "DiagnosticSignError",
+  linehl = "DiagnosticLineError", numhl = "DiagnosticSignError",
+})
+vim.fn.sign_define("DiagnosticSignWarn", {
+  text = " ", texthl = "DiagnosticSignWarn",
+  linehl = "DiagnosticLineWarn", numhl = "DiagnosticSignWarn",
+})
+vim.fn.sign_define("DiagnosticSignHint", {
+  text = "󰌵 ", texthl = "DiagnosticSignHint",
+  linehl = "", numhl = "DiagnosticSignHint",
+})
+vim.fn.sign_define("DiagnosticSignInfo", {
+  text = " ", texthl = "DiagnosticSignInfo",
+  linehl = "", numhl = "DiagnosticSignInfo",
+})
 
 -- =====================
--- Autosave
+-- Autosave (debounced, 1s delay)
 -- =====================
-vim.api.nvim_create_augroup("AutoSave", { clear = true })
-vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged", "FocusLost", "BufLeave" }, {
-  group = "AutoSave",
-  callback = function()
-    if vim.bo.modifiable and vim.bo.modified then
-      vim.cmd("silent! write")
+local autosave_timer = vim.uv.new_timer()
+
+local function schedule_save()
+  local buf = vim.api.nvim_get_current_buf()
+  if not vim.bo[buf].modifiable or not vim.bo[buf].modified then return end
+  if vim.bo[buf].buftype ~= "" then return end  -- skip non-file buffers (terminal, quickfix, etc.)
+  if vim.api.nvim_buf_get_name(buf) == "" then return end  -- skip unnamed buffers
+
+  autosave_timer:stop()
+  autosave_timer:start(1000, 0, vim.schedule_wrap(function()
+    if vim.api.nvim_buf_is_valid(buf) and vim.bo[buf].modified then
+      vim.api.nvim_buf_call(buf, function()
+        vim.cmd("silent! write")
+      end)
     end
-  end,
+  end))
+end
+
+vim.api.nvim_create_augroup("AutoSave", { clear = true })
+vim.api.nvim_create_autocmd({ "InsertLeave", "TextChanged", "TextChangedI", "FocusLost" }, {
+  group = "AutoSave",
+  callback = schedule_save,
 })

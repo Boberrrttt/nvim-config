@@ -26,6 +26,12 @@ local function apply_neo_tree_highlights()
   vim.api.nvim_set_hl(0, "DiagnosticSignWarn", { fg = "#E6B84C" })
   vim.api.nvim_set_hl(0, "DiagnosticSignInfo", { fg = "#7EC8E3" })
   vim.api.nvim_set_hl(0, "DiagnosticSignHint", { fg = "#9CDCFE" })
+
+  -- Neo-tree filename colors when diagnostics exist
+  vim.api.nvim_set_hl(0, "NeoTreeDiagnosticError", { fg = "#FF3333", bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeDiagnosticWarn", { fg = "#E6B84C", bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeDiagnosticInfo", { fg = "#7EC8E3" })
+  vim.api.nvim_set_hl(0, "NeoTreeDiagnosticHint", { fg = "#9CDCFE" })
 end
 
 vim.api.nvim_create_autocmd("ColorScheme", {
@@ -45,7 +51,7 @@ local function name_with_diagnostics(config, node, state)
   if lookup and result then
     local diag = neo_tree_utils.index_by_path(lookup, node:get_id())
     if diag and diag.severity_string then
-      result.highlight = "Diagnostic" .. diag.severity_string
+      result.highlight = "NeoTreeDiagnostic" .. diag.severity_string
     end
   end
   return result
@@ -56,6 +62,7 @@ require("neo-tree").setup({
   enable_git_status = true,
   enable_diagnostics = true,
   use_libuv_file_watcher = true,
+  sources = { "filesystem", "buffers", "git_status", "diagnostics" },
 
   filesystem = {
     filtered_items = {

@@ -17,7 +17,7 @@ require("lazy").setup({
 
   -- Syntax highlighting & code parsing
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
-  { "p00f/nvim-ts-rainbow" },
+  { "HiPhish/rainbow-delimiters.nvim" },
 
   -- Autocompletion & snippets
   { "hrsh7th/nvim-cmp" },
