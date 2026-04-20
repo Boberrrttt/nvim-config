@@ -10,6 +10,38 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+  -- Sessions: save on exit for manual `:AutoSession restore` — do not auto-restore (clean layout: neo-tree + code)
+  {
+    "rmagatti/auto-session",
+    lazy = false,
+    priority = 999,
+    opts = {
+      auto_save = true,
+      auto_restore = false,
+      suppressed_dirs = { "~/", "~/Downloads", "/" },
+      -- Keep floating/special windows so toggleterm floats can be saved in the session
+      close_unsupported_windows = false,
+      -- Do not persist undotree in sessions (open only with <leader>u)
+      close_filetypes_on_save = { "checkhealth", "undotree" },
+      post_restore_cmds = {
+        function()
+          vim.schedule(function()
+            pcall(vim.cmd, "silent! UndotreeHide")
+            for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+              if vim.api.nvim_buf_is_valid(buf) then
+                local ft = vim.bo[buf].filetype
+                local name = vim.api.nvim_buf_get_name(buf)
+                if ft == "undotree" or name:find("diffpanel_", 1, true) then
+                  pcall(vim.api.nvim_buf_delete, buf, { force = true })
+                end
+              end
+            end
+          end)
+        end,
+      },
+    },
+  },
+
   -- Official Dracula (https://draculatheme.com/vim)
   {
     "dracula/vim",

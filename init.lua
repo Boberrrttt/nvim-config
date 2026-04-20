@@ -1,8 +1,9 @@
+-- Options before plugins so sessionoptions applies when auto-session restores
+require("options")
+
 -- Bootstrap lazy.nvim & load plugins
 require("plugins")
 
--- Core settings
-require("options")
 require("keymaps")
 
 -- LSP & autocompletion (LSP after theme so diagnostics highlights / config apply last)

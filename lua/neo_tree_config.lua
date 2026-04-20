@@ -62,7 +62,7 @@ require("neo-tree").setup({
   enable_git_status = true,
   enable_diagnostics = true,
   use_libuv_file_watcher = true,
-  sources = { "filesystem", "buffers", "git_status", "diagnostics" },
+  sources = { "filesystem", "buffers", "git_status" },
 
   filesystem = {
     filtered_items = {
@@ -144,3 +144,20 @@ vim.api.nvim_create_autocmd("User", {
 
 -- Pick up git changes made outside Neovim (terminal, other tools)
 vim.api.nvim_create_autocmd("FocusGained", { callback = refresh_neo_tree })
+
+-- Startup: only file tree + editor (no auto-session restore). Show tree on the left, focus stays in code buffer.
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    if vim.g.started_by_firenvim or vim.g.vscode then
+      return
+    end
+    vim.schedule(function()
+      pcall(require("neo-tree.command").execute, {
+        action = "show",
+        position = "left",
+        source = "filesystem",
+      })
+    end)
+  end,
+})

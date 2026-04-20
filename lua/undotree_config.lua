@@ -1,4 +1,5 @@
 -- mbbill/undotree shells out to `diff`; Windows rarely has it on PATH (use Git's diff.exe).
+-- Split position: g:undotree_WindowLayout is set in lua/options.lua (must load before the plugin).
 
 local function diff_executable()
   if vim.fn.has("win32") ~= 1 then
