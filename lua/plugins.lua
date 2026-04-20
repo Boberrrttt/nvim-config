@@ -10,6 +10,18 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+  -- Official Dracula (https://draculatheme.com/vim)
+  {
+    "dracula/vim",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.opt.termguicolors = true
+      vim.opt.background = "dark"
+      vim.cmd.colorscheme("dracula")
+    end,
+  },
+
   -- Status line
   { "nvim-lualine/lualine.nvim" },
 
@@ -71,6 +83,15 @@ require("lazy").setup({
   -- Git
   { "lewis6991/gitsigns.nvim" },
   { "tpope/vim-fugitive" },
+
+  -- Undo history panel (see lua/undotree_config.lua — needs `diff` / Git diff.exe on Windows)
+  {
+    "mbbill/undotree",
+    cmd = "UndotreeToggle",
+    config = function()
+      require("undotree_config")
+    end,
+  },
 
   -- Icons: devicons + material icons
   {

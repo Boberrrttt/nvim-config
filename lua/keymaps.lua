@@ -43,6 +43,9 @@ for i = 1, 9 do
 end
 map("n", "<leader>q", ":Bdelete<CR>", { noremap = true, silent = true })
 
+-- Undo tree
+map("n", "<leader>u", "<cmd>UndotreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle undo tree" })
+
 -- Neo-tree (file explorer) — <leader>e = explorer only (no duplicate binding)
 map("n", "<leader>e", ":Neotree toggle left<CR>", { noremap = true, silent = true, desc = "Toggle file explorer" })
 map("n", "<leader>df", function()

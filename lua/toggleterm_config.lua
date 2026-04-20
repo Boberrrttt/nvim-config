@@ -1,3 +1,5 @@
+local p = require("palette")
+
 require("toggleterm").setup {
   -- <C-\> alone is not mapped here; use <C-\>1 .. <C-\>9 in keymaps.lua so each digit is a separate terminal.
   start_in_insert = true,
@@ -16,9 +18,9 @@ require("toggleterm").setup {
   },
 
   highlights = {
-    Normal = { guibg = "#12171f" },
-    NormalFloat = { guibg = "#12171f" },
-    FloatBorder = { guifg = "#3EB489", guibg = "#12171f" },
+    Normal = { guibg = p.bg2 },
+    NormalFloat = { guibg = p.bg2 },
+    FloatBorder = { guifg = p.border, guibg = p.bg2 },
   },
 
   on_open = function(term)
