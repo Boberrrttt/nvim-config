@@ -71,6 +71,17 @@ for i = 1, 9 do
   )
 end
 
+-- Double Ctrl+\ closes the focused floating terminal (same chord family as <C-\>1–9)
+map({ "n", "t" }, "<C-\\><C-\\>", function()
+  if vim.bo.filetype ~= "toggleterm" then
+    return
+  end
+  local _, term = require("toggleterm.terminal").identify()
+  if term and term:is_open() then
+    term:close()
+  end
+end, { noremap = true, silent = true, desc = "Close floating terminal" })
+
 -- Open new floating terminal (extra instance; does not use the 1–9 slots)
 map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
