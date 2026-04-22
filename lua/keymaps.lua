@@ -21,6 +21,10 @@ end, { desc = "Rename current file" })
 
 -- Git-fugitive diff split
 map("n", "<leader>gd", ":Gdiffsplit<CR>", { noremap = true, silent = true })
+-- lazygit (toggleterm float; see lua/lazygit_config.lua)
+map("n", "<leader>gg", function()
+  require("lazygit_config").toggle()
+end, { noremap = true, silent = true, desc = "Toggle lazygit" })
 
 -- Clipboard
 map("v", "<C-c>", '"+y', { noremap = true, silent = true })
