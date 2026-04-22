@@ -70,9 +70,16 @@ require("lazy").setup({
   { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
   { "HiPhish/rainbow-delimiters.nvim" },
 
-  -- Autocompletion & snippets
-  { "hrsh7th/nvim-cmp" },
-  { "hrsh7th/cmp-nvim-lsp" },
+  -- Autocompletion & snippets (buffer/path/luasnip need matching cmp-* plugins or sources break)
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "saadparwaiz1/cmp_luasnip",
+    },
+  },
   { "L3MON4D3/LuaSnip" },
   { "rafamadriz/friendly-snippets" },
   { "onsails/lspkind-nvim" },
