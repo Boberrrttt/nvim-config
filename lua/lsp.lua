@@ -6,19 +6,22 @@
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 local palette = require("palette")
 
--- npm global CLIs on Windows (adjust if you use a different Node/npm layout)
-local ts_ls_cmd = {
-  "cmd.exe",
-  "/c",
-  "C:\\Users\\robert\\AppData\\Roaming\\npm\\typescript-language-server.cmd",
-  "--stdio",
-}
-local pyright_cmd = {
-  "cmd.exe",
-  "/c",
-  "C:\\Users\\robert\\AppData\\Roaming\\npm\\pyright-langserver.cmd",
-  "--stdio",
-}
+-- npm global CLIs on Windows: use this user's AppData, not a hardcoded profile path
+local function npm_shim_cmd(basename)
+  local appdata = os.getenv("APPDATA")
+  if not appdata or appdata == "" then
+    return nil
+  end
+  return {
+    "cmd.exe",
+    "/c",
+    appdata .. "\\npm\\" .. basename,
+    "--stdio",
+  }
+end
+
+local ts_ls_cmd = npm_shim_cmd("typescript-language-server.cmd")
+local pyright_cmd = npm_shim_cmd("pyright-langserver.cmd")
 
 -- =====================
 -- Diagnostics
@@ -48,21 +51,22 @@ vim.lsp.config("*", {
 })
 
 -- Per-server overrides (merged with nvim-lspconfig's lsp/ts_ls.lua, lsp/pyright.lua, lsp/lua_ls.lua)
-vim.lsp.config("ts_ls", {
-  cmd = ts_ls_cmd,
-})
+vim.lsp.config("ts_ls", ts_ls_cmd and { cmd = ts_ls_cmd } or {})
 
 local venv = os.getenv("VIRTUAL_ENV")
 local python_path = venv and (venv .. "\\Scripts\\python.exe") or "python"
 
-vim.lsp.config("pyright", {
-  cmd = pyright_cmd,
+local pyright_settings = {
   settings = {
     python = {
       pythonPath = python_path,
     },
   },
-})
+}
+if pyright_cmd then
+  pyright_settings.cmd = pyright_cmd
+end
+vim.lsp.config("pyright", pyright_settings)
 
 vim.lsp.config("lua_ls", {
   settings = {
