@@ -41,6 +41,11 @@ for i, name in ipairs(rd_groups) do
   vim.api.nvim_set_hl(0, name, { fg = rd_cycle[((i - 1) % #rd_cycle) + 1] })
 end
 
+-- lualine defaults: refresh on BufWritePost etc. But LSP diagnostics and gitsigns
+-- `diff` stats update *after* save, asynchronously — so we also refresh on
+-- DiagnosticChanged and User GitSignsUpdate (see autocommands below). The
+-- lualine `filename` component does not color by diagnostic severity; bufferline
+-- does for tab colors; lualine section B shows error/warn counts.
 require("lualine").setup({
   options = {
     theme = "dracula",
@@ -49,6 +54,24 @@ require("lualine").setup({
     component_separators = { left = "", right = "" },
     section_separators = { left = "", right = "" },
     disabled_filetypes = { statusline = { "neo-tree", "neo-tree-popup" } },
+    -- Must list full `events` when setting refresh (lualine merges this table, but
+    -- `events` is a full replacement on merge — include defaults from lualine
+    -- config + DiagnosticChanged for async LSP publish after :w / autosave).
+    refresh = {
+      events = {
+        "WinEnter",
+        "BufEnter",
+        "BufWritePost",
+        "SessionLoadPost",
+        "FileChangedShellPost",
+        "VimResized",
+        "Filetype",
+        "CursorMoved",
+        "CursorMovedI",
+        "ModeChanged",
+        "DiagnosticChanged",
+      },
+    },
   },
   sections = {
     lualine_a = { "mode" },
@@ -117,6 +140,28 @@ bufferline.setup({
     hover = { enabled = true, delay = 150, reveal = { "close" } },
     always_show_bufferline = true,
   },
+})
+
+-- After autosave, git status and LSP can finish a moment later; lualine/bufferline
+-- were only redrawing on CursorMoved/BufWritePost, so chrome looked stale.
+vim.api.nvim_create_augroup("ChromeAfterAsync", { clear = true })
+vim.api.nvim_create_autocmd("User", {
+  group = "ChromeAfterAsync",
+  pattern = "GitSignsUpdate",
+  callback = function()
+    vim.schedule(function()
+      require("lualine").refresh({ kind = "window", place = { "statusline" }, trigger = "autocmd" })
+      vim.cmd.redrawtabline()
+    end)
+  end,
+})
+vim.api.nvim_create_autocmd("DiagnosticChanged", {
+  group = "ChromeAfterAsync",
+  callback = function()
+    vim.schedule(function()
+      vim.cmd.redrawtabline()
+    end)
+  end,
 })
 
 require("ibl").setup({
