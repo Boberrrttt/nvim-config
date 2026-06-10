@@ -170,6 +170,36 @@ require("lazy").setup({
     end,
   },
 
+  { "nvim-treesitter/nvim-treesitter-context" },
+
+  {
+    "iamcco/markdown-preview.nvim",
+    cmd = { "MarkdownPreview", "MarkdownPreviewToggle", "MarkdownPreviewStop" },
+    build = "cd app && npm install",
+    ft = { "markdown" },
+  },
+
+  {
+    "rachartier/tiny-inline-diagnostic.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("tiny-inline-diagnostic").setup()
+      vim.diagnostic.config({ virtual_text = false })
+    end,
+  },
+
+  {
+    "sindrets/diffview.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+  },
+
+  {
+    "folke/which-key.nvim",
+    event = "VeryLazy",
+    opts = {},
+  },
+
 }, {
   ui = {
     border = "rounded",

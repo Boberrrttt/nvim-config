@@ -90,3 +90,9 @@ end, { noremap = true, silent = true, desc = "Close floating terminal" })
 map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })
+
+-- Plans
+map("n", "<leader>pp", function()
+  require("telescope.builtin").find_files({ cwd = vim.fn.expand("$USERPROFILE/.cursor/plans") })
+end, { desc = "Open plans" })
+map("n", "<leader>pm", "<cmd>MarkdownPreviewToggle<CR>", { noremap = true, silent = true, desc = "Toggle markdown preview" })
