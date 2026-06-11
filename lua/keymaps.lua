@@ -26,6 +26,11 @@ map("n", "<leader>gg", function()
   require("lazygit_config").toggle()
 end, { noremap = true, silent = true, desc = "Toggle lazygit" })
 
+-- Copy current file path to clipboard
+map("n", "<leader>cp", function()
+  vim.fn.setreg("+", vim.fn.expand("%:p"))
+end, { desc = "Copy file path" })
+
 -- Clipboard
 map("v", "<C-c>", '"+y', { noremap = true, silent = true })
 map("v", "<C-x>", '"+d', { noremap = true, silent = true })

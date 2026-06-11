@@ -1,5 +1,5 @@
 os:
   editPreset: ''
-  edit: 'powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\robert\AppData\Local\nvim/scripts/open-from-lazygit.ps1" -Path "{{filename}}"'
-  editAtLine: 'powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\robert\AppData\Local\nvim/scripts/open-from-lazygit.ps1" -Path "{{filename}}" -Line {{line}}'
-  editAtLineAndWait: 'powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\robert\AppData\Local\nvim/scripts/open-from-lazygit.ps1" -Path "{{filename}}" -Line {{line}}'
+  edit: 'powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\User\AppData\Local\nvim/scripts/open-from-lazygit.ps1" -Path "{{filename}}"'
+  editAtLine: 'powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\User\AppData\Local\nvim/scripts/open-from-lazygit.ps1" -Path "{{filename}}" -Line {{line}}'
+  editAtLineAndWait: 'powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\User\AppData\Local\nvim/scripts/open-from-lazygit.ps1" -Path "{{filename}}" -Line {{line}}'
