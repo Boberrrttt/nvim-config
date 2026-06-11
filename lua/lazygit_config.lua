@@ -14,6 +14,7 @@ local function write_lazygit_config()
     script_path
   )
   vim.fn.writefile({
+    "promptToReturnFromSubprocess: false",
     "os:",
     "  editPreset: ''",
     "  edit: '" .. edit .. "'",
