@@ -96,6 +96,14 @@ map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })
 
+local resize_float = require("toggleterm_config").resize_float
+map({ "n", "t" }, "<C-\\>]", function()
+  resize_float(5)
+end, { noremap = true, silent = true, desc = "Grow floating terminal" })
+map({ "n", "t" }, "<C-\\>[", function()
+  resize_float(-5)
+end, { noremap = true, silent = true, desc = "Shrink floating terminal" })
+
 -- Plans
 map("n", "<leader>pp", function()
   require("telescope.builtin").find_files({ cwd = vim.fn.expand("$USERPROFILE/.cursor/plans") })
