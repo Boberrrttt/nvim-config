@@ -42,15 +42,34 @@ require("lazy").setup({
     },
   },
 
-  -- Official Dracula (https://draculatheme.com/vim)
   {
-    "dracula/vim",
+    "rebelot/kanagawa.nvim",
     lazy = false,
     priority = 1000,
     config = function()
       vim.opt.termguicolors = true
+      vim.opt.laststatus = 3
+      require("kanagawa").setup({
+        compile = false,
+        undercurl = true,
+        theme = "dragon",
+        background = {
+          dark = "dragon",
+          light = "lotus",
+        },
+        colors = {
+          theme = {
+            all = {
+              ui = {
+                bg_gutter = "none",
+              },
+            },
+          },
+        },
+      })
       vim.opt.background = "dark"
-      vim.cmd.colorscheme("dracula")
+      vim.cmd.colorscheme("kanagawa")
+      require("palette").refresh()
     end,
   },
 

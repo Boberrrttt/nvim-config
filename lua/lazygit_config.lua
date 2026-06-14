@@ -98,4 +98,4 @@ local function open_file(path, line)
   return 0
 end
 
-return { toggle = toggle, open_file = open_file }
+return { toggle = toggle, open_file = open_file, write_lazygit_config = write_lazygit_config }

@@ -1,5 +1,3 @@
--- UI chrome (options, lualine, bufferline, ibl). Colors: dracula/vim via plugins.lua.
-
 vim.opt.background = "dark"
 vim.opt.termguicolors = true
 vim.opt.laststatus = 3
@@ -21,13 +19,6 @@ vim.opt.mousemoveevent = true
 
 local p = require("palette")
 
--- ibl v3 uses Ibl* groups (dracula has no built-in ibl v3 hl names).
-vim.api.nvim_set_hl(0, "IblIndent", { fg = "#44475a", nocombine = true })
-vim.api.nvim_set_hl(0, "IblWhitespace", { link = "IblIndent" })
-vim.api.nvim_set_hl(0, "IblScope", { fg = p.accent, bold = true })
-
--- rainbow-delimiters.nvim (Dracula: pink / purple / cyan)
-local rd_cycle = { "#ff79c6", "#bd93f9", "#8be9fd" }
 local rd_groups = {
   "RainbowDelimiterRed",
   "RainbowDelimiterYellow",
@@ -37,9 +28,30 @@ local rd_groups = {
   "RainbowDelimiterViolet",
   "RainbowDelimiterCyan",
 }
-for i, name in ipairs(rd_groups) do
-  vim.api.nvim_set_hl(0, name, { fg = rd_cycle[((i - 1) % #rd_cycle) + 1] })
+
+local function apply_chrome_highlights()
+  local colors = require("palette")
+  vim.api.nvim_set_hl(0, "IblIndent", { fg = colors.ibl_indent, nocombine = true })
+  vim.api.nvim_set_hl(0, "IblWhitespace", { link = "IblIndent" })
+  vim.api.nvim_set_hl(0, "IblScope", { fg = colors.ibl_scope, bold = true })
+  for i, name in ipairs(rd_groups) do
+    vim.api.nvim_set_hl(0, name, { fg = colors.rainbow[((i - 1) % #colors.rainbow) + 1] })
+  end
+  vim.api.nvim_set_hl(0, "DiagnosticLineError", { bg = colors.line_err })
+  vim.api.nvim_set_hl(0, "DiagnosticLineWarn", { bg = colors.line_warn })
 end
+
+apply_chrome_highlights()
+
+vim.api.nvim_create_autocmd("ColorScheme", {
+  pattern = "kanagawa*",
+  callback = function()
+    apply_chrome_highlights()
+    pcall(function()
+      require("lazygit_config").write_lazygit_config()
+    end)
+  end,
+})
 
 -- lualine defaults: refresh on BufWritePost etc. But LSP diagnostics and gitsigns
 -- `diff` stats update *after* save, asynchronously — so we also refresh on
@@ -48,7 +60,7 @@ end
 -- does for tab colors; lualine section B shows error/warn counts.
 require("lualine").setup({
   options = {
-    theme = "dracula",
+    theme = "auto",
     globalstatus = true,
     icons_enabled = true,
     component_separators = { left = "", right = "" },

@@ -104,7 +104,16 @@ map({ "n", "t" }, "<C-\\>[", function()
   resize_float(-5)
 end, { noremap = true, silent = true, desc = "Shrink floating terminal" })
 
--- Plans
+map("n", "<leader>tw", function()
+  require("kanagawa_themes").load("wave")
+end, { noremap = true, silent = true, desc = "Kanagawa wave theme" })
+map("n", "<leader>td", function()
+  require("kanagawa_themes").load("dragon")
+end, { noremap = true, silent = true, desc = "Kanagawa dragon theme" })
+map("n", "<leader>tl", function()
+  require("kanagawa_themes").load("lotus")
+end, { noremap = true, silent = true, desc = "Kanagawa lotus theme" })
+
 map("n", "<leader>pp", function()
   require("telescope.builtin").find_files({ cwd = vim.fn.expand("$USERPROFILE/.cursor/plans") })
 end, { desc = "Open plans" })

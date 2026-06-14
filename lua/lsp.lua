@@ -4,7 +4,6 @@
 -- ========================================
 
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
-local palette = require("palette")
 
 -- npm global CLIs on Windows: use this user's AppData, not a hardcoded profile path
 local function npm_shim_cmd(basename)
@@ -132,9 +131,6 @@ function CopyLineDiagnostics()
   vim.fn.setreg("+", table.concat(messages, "\n"))
   print("Diagnostics copied to clipboard!")
 end
-
-vim.api.nvim_set_hl(0, "DiagnosticLineError", { bg = palette.line_err })
-vim.api.nvim_set_hl(0, "DiagnosticLineWarn", { bg = palette.line_warn })
 
 vim.fn.sign_define("DiagnosticSignError", {
   text = "✘",
