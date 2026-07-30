@@ -86,7 +86,19 @@ require("lazy").setup({
   { "tpope/vim-eunuch" },
 
   -- Syntax highlighting & code parsing
-  { "nvim-treesitter/nvim-treesitter", build = ":TSUpdate" },
+  {
+    "nvim-treesitter/nvim-treesitter",
+    branch = "master",
+    lazy = false,
+    build = ":TSUpdate",
+    config = function()
+      -- ponytail: no C compiler on PATH; skip ensure_installed/auto_install noise
+      require("nvim-treesitter.configs").setup({
+        highlight = { enable = true },
+        indent = { enable = true },
+      })
+    end,
+  },
   { "HiPhish/rainbow-delimiters.nvim" },
 
   -- Autocompletion & snippets (buffer/path/luasnip need matching cmp-* plugins or sources break)
@@ -125,13 +137,13 @@ require("lazy").setup({
   },
 
   -- Buffer deletion
-  { "kazhala/close-buffers.nvim" },
+  { "kazhala/close-buffers.nvim", config = true },
 
   -- Indentation guides
   { "lukas-reineke/indent-blankline.nvim", main = "ibl" },
 
   -- Commenting
-  { "numToStr/Comment.nvim" },
+  { "numToStr/Comment.nvim", opts = {} },
 
   -- Debugging
   { "mfussenegger/nvim-dap" },
@@ -139,7 +151,50 @@ require("lazy").setup({
   { "theHamsta/nvim-dap-virtual-text", dependencies = { "mfussenegger/nvim-dap" } },
 
   -- Git
-  { "lewis6991/gitsigns.nvim" },
+  {
+    "lewis6991/gitsigns.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    opts = {
+      signs = {
+        add = { text = "│" },
+        change = { text = "│" },
+        delete = { text = "_" },
+        topdelete = { text = "‾" },
+        changedelete = { text = "~" },
+        untracked = { text = "┆" },
+      },
+      signcolumn = true,
+      numhl = false,
+      linehl = false,
+      watch_gitdir = { follow_files = true },
+      current_line_blame = true,
+      current_line_blame_opts = { delay = 600, virt_text_pos = "eol" },
+      current_line_blame_formatter = "<author>, <author_time:%R> · <summary>",
+      on_attach = function(bufnr)
+        local gitsigns = require("gitsigns")
+        local opts = { buffer = bufnr }
+        vim.keymap.set("n", "]c", function()
+          if vim.wo.diff then
+            vim.cmd.normal({ "]c", bang = true })
+          else
+            gitsigns.nav_hunk("next")
+          end
+        end, opts)
+        vim.keymap.set("n", "[c", function()
+          if vim.wo.diff then
+            vim.cmd.normal({ "[c", bang = true })
+          else
+            gitsigns.nav_hunk("prev")
+          end
+        end, opts)
+        vim.keymap.set("n", "<leader>hs", gitsigns.stage_hunk, opts)
+        vim.keymap.set("n", "<leader>hr", gitsigns.reset_hunk, opts)
+        vim.keymap.set("n", "<leader>hp", gitsigns.preview_hunk, opts)
+        vim.keymap.set("n", "<leader>hb", gitsigns.toggle_current_line_blame, opts)
+        vim.keymap.set("n", "<leader>hd", gitsigns.diffthis, opts)
+      end,
+    },
+  },
   { "tpope/vim-fugitive" },
 
   -- Undo history panel (see lua/undotree_config.lua — needs `diff` / Git diff.exe on Windows)
@@ -189,7 +244,10 @@ require("lazy").setup({
     end,
   },
 
-  { "nvim-treesitter/nvim-treesitter-context" },
+  {
+    "nvim-treesitter/nvim-treesitter-context",
+    opts = { max_lines = 3, separator = "─" },
+  },
 
   {
     "iamcco/markdown-preview.nvim",
@@ -201,8 +259,16 @@ require("lazy").setup({
   {
     "rachartier/tiny-inline-diagnostic.nvim",
     event = "VeryLazy",
+    priority = 1000,
     config = function()
-      require("tiny-inline-diagnostic").setup()
+      require("tiny-inline-diagnostic").setup({
+        preset = "modern",
+        options = {
+          show_source = { enabled = true },
+          multilines = { enabled = true, always_show = true },
+          overflow = { mode = "wrap" },
+        },
+      })
       vim.diagnostic.config({ virtual_text = false })
     end,
   },
@@ -210,7 +276,7 @@ require("lazy").setup({
   {
     "sindrets/diffview.nvim",
     dependencies = { "nvim-lua/plenary.nvim" },
-    cmd = { "DiffviewOpen", "DiffviewFileHistory" },
+    cmd = { "DiffviewOpen", "DiffviewFileHistory", "DiffviewClose" },
   },
 
   {

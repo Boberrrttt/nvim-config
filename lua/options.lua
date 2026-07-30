@@ -1,7 +1,5 @@
--- Hidden buffers survive when switching away (toggleterm README; also helps session save)
 vim.opt.hidden = true
 
--- rmagatti/auto-session: include :terminal / toggleterm in Session.vim (see :h sessionoptions)
 vim.opt.sessionoptions = {
   "blank",
   "buffers",
@@ -15,20 +13,56 @@ vim.opt.sessionoptions = {
   "localoptions",
 }
 
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.signcolumn = "yes"
+vim.opt.cursorline = true
+vim.opt.scrolloff = 8
+vim.opt.sidescrolloff = 8
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
+vim.opt.softtabstop = 2
 vim.opt.expandtab = true
-vim.g.mapleader = " "
+vim.opt.smartindent = true
+vim.opt.wrap = false
 vim.opt.termguicolors = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.incsearch = true
+vim.opt.hlsearch = true
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+vim.opt.updatetime = 250
+vim.opt.timeoutlen = 400
+vim.opt.undofile = true
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.confirm = true
+vim.opt.mouse = "a"
+vim.opt.clipboard = "unnamedplus"
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
+vim.opt.pumheight = 12
+vim.opt.list = true
 
--- mbbill/undotree: before plugin loads, else default layout 1 = left. :h undotree_WindowLayout
--- 3 = code left; undo tree + diff panel both in the right column (4 puts diff full-width on the bottom)
 vim.g.undotree_WindowLayout = 3
 
-vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
+vim.api.nvim_create_autocmd("TextYankPost", {
+  desc = "Highlight yanked text",
   callback = function()
-    require("gitsigns").refresh()
+    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 150 })
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufReadPost", {
+  desc = "Restore last cursor position",
+  callback = function(event)
+    local mark = vim.api.nvim_buf_get_mark(event.buf, '"')
+    local line_count = vim.api.nvim_buf_line_count(event.buf)
+    if mark[1] > 0 and mark[1] <= line_count then
+      pcall(vim.api.nvim_win_set_cursor, 0, mark)
+    end
   end,
 })

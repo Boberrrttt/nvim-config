@@ -1,11 +1,8 @@
-local neo_tree_components = require("neo-tree.sources.common.components")
+﻿local neo_tree_components = require("neo-tree.sources.common.components")
 local neo_tree_utils = require("neo-tree.utils")
 
--- Must run *after* neo-tree's own highlights.setup() (called inside setup()), or git/diag colors get overwritten.
--- On ColorScheme, neo-tree re-runs highlights.setup; we schedule so our defs win.
 local function apply_neo_tree_highlights()
   local p = require("palette")
-  -- Git: restrained palette (accent family + warn/err only)
   vim.api.nvim_set_hl(0, "NeoTreeGitAdded", { fg = p.accent_muted, bold = true })
   vim.api.nvim_set_hl(0, "NeoTreeGitModified", { fg = p.warn, bold = true })
   vim.api.nvim_set_hl(0, "NeoTreeGitDeleted", { fg = p.err, bold = true })
@@ -17,7 +14,6 @@ local function apply_neo_tree_highlights()
   vim.api.nvim_set_hl(0, "NeoTreeGitUnstaged", { fg = p.warn })
   vim.api.nvim_set_hl(0, "NeoTreeFileName", { fg = p.fg })
 
-  -- LSP diagnostics (custom name component + diagnostics column)
   vim.api.nvim_set_hl(0, "DiagnosticError", { fg = p.err })
   vim.api.nvim_set_hl(0, "DiagnosticWarn", { fg = p.warn })
   vim.api.nvim_set_hl(0, "DiagnosticInfo", { fg = p.fg_dim })
@@ -27,7 +23,6 @@ local function apply_neo_tree_highlights()
   vim.api.nvim_set_hl(0, "DiagnosticSignInfo", { fg = p.fg_dim })
   vim.api.nvim_set_hl(0, "DiagnosticSignHint", { fg = p.fg_dim })
 
-  -- Neo-tree filename colors when diagnostics exist
   vim.api.nvim_set_hl(0, "NeoTreeDiagnosticError", { fg = p.err, bold = true })
   vim.api.nvim_set_hl(0, "NeoTreeDiagnosticWarn", { fg = p.warn, bold = true })
   vim.api.nvim_set_hl(0, "NeoTreeDiagnosticInfo", { fg = p.fg_dim })
@@ -44,7 +39,6 @@ local function refresh_neo_tree()
   pcall(require("neo-tree.command").execute, { action = "refresh" })
 end
 
--- Filename: git-colored by default; when diagnostics exist, tint the name with worst severity.
 local function name_with_diagnostics(config, node, state)
   local result = neo_tree_components.name(config, node, state)
   local lookup = state.diagnostics_lookup
@@ -94,10 +88,10 @@ require("neo-tree").setup({
     },
     diagnostics = {
       symbols = {
-        error = " ",
-        warn = " ",
-        info = " ",
-        hint = "󰌶 ",
+        error = "E ",
+        warn = "W ",
+        info = "I ",
+        hint = "H ",
       },
       highlights = {
         error = "DiagnosticSignError",
@@ -108,31 +102,51 @@ require("neo-tree").setup({
     },
     git_status = {
       symbols = {
-        added = "",
-        modified = "",
-        deleted = "",
-        renamed = "➜",
-        untracked = "",
+        added = "A",
+        modified = "M",
+        deleted = "D",
+        renamed = "R",
+        untracked = "U",
         ignored = "",
         unstaged = "",
-        staged = "",
-        conflict = "",
+        staged = "S",
+        conflict = "!",
       },
     },
   },
 
+  source_selector = {
+    winbar = true,
+    statusline = false,
+    sources = {
+      { source = "filesystem", display_name = " Files " },
+      { source = "buffers", display_name = " Bufs " },
+      { source = "git_status", display_name = " Git " },
+    },
+  },
+
   window = {
-    width = 32,
+    width = 34,
     mappings = {
       ["o"] = "open",
       ["<space>"] = "toggle_node",
       ["C"] = "close_node",
       ["R"] = "refresh",
+      ["H"] = "toggle_hidden",
+      ["P"] = { "toggle_preview", config = { use_float = true } },
+      ["Y"] = function(state)
+        local node = state.tree:get_node()
+        if not node then
+          return
+        end
+        local path = node:get_id()
+        vim.fn.setreg("+", path)
+        vim.notify("Copied " .. path)
+      end,
     },
   },
 })
 
--- Apply once at startup after the event loop settles (theme may load after this file)
 vim.schedule(apply_neo_tree_highlights)
 
 vim.api.nvim_create_autocmd("DiagnosticChanged", { callback = refresh_neo_tree })
@@ -141,11 +155,8 @@ vim.api.nvim_create_autocmd("User", {
   pattern = "GitsignsUpdate",
   callback = refresh_neo_tree,
 })
-
--- Pick up git changes made outside Neovim (terminal, other tools)
 vim.api.nvim_create_autocmd("FocusGained", { callback = refresh_neo_tree })
 
--- Startup: only file tree + editor (no auto-session restore). Show tree on the left, focus stays in code buffer.
 vim.api.nvim_create_autocmd("VimEnter", {
   once = true,
   callback = function()

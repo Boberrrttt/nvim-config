@@ -26,10 +26,7 @@ local pyright_cmd = npm_shim_cmd("pyright-langserver.cmd")
 -- Diagnostics
 -- =====================
 local diag_config = {
-  virtual_text = {
-    spacing = 2,
-    source = true,
-  },
+  virtual_text = false,
   signs = true,
   underline = true,
   update_in_insert = true,
@@ -39,6 +36,7 @@ local diag_config = {
     source = "always",
     header = "",
     prefix = "",
+    focusable = true,
   },
 }
 
@@ -106,10 +104,43 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local opts = { buffer = bufnr, noremap = true, silent = true }
     vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
     vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+    vim.keymap.set("n", "gt", vim.lsp.buf.type_definition, opts)
     vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
     vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "gs", vim.lsp.buf.signature_help, opts)
+    vim.keymap.set("i", "<C-s>", vim.lsp.buf.signature_help, opts)
     vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
     vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+    vim.keymap.set("n", "<leader>fm", function()
+      vim.lsp.buf.format({ async = true })
+    end, opts)
+  end,
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+  desc = "Format with LSP before save",
+  callback = function(event)
+    if vim.bo[event.buf].buftype ~= "" then
+      return
+    end
+
+    local clients = vim.lsp.get_clients({ bufnr = event.buf })
+    for _, client in ipairs(clients) do
+      local supports = client.supports_method
+        and client:supports_method("textDocument/formatting")
+      if supports then
+        vim.lsp.buf.format({
+          bufnr = event.buf,
+          async = false,
+          timeout_ms = 2000,
+          filter = function(format_client)
+            return format_client.id == client.id
+          end,
+        })
+        return
+      end
+    end
   end,
 })
 
@@ -119,17 +150,20 @@ function CopyLineDiagnostics()
   local diags = vim.diagnostic.get(bufnr, { lnum = lnum })
 
   if #diags == 0 then
-    print("No diagnostics on this line")
+    vim.notify("No diagnostics on this line", vim.log.levels.INFO)
     return
   end
 
   local messages = {}
-  for _, d in ipairs(diags) do
-    table.insert(messages, d.message)
+  for _, diagnostic in ipairs(diags) do
+    local source = diagnostic.source and (diagnostic.source .. ": ") or ""
+    table.insert(messages, source .. diagnostic.message)
   end
 
-  vim.fn.setreg("+", table.concat(messages, "\n"))
-  print("Diagnostics copied to clipboard!")
+  local text = table.concat(messages, "\n")
+  vim.fn.setreg("+", text)
+  vim.fn.setreg('"', text)
+  vim.notify("Diagnostics copied (" .. #diags .. ")", vim.log.levels.INFO)
 end
 
 vim.fn.sign_define("DiagnosticSignError", {

@@ -1,44 +1,92 @@
 local map = vim.keymap.set
 
--- Telescope
-map("n", "<C-p>", "<cmd>Telescope find_files<CR>", { noremap = true, silent = true })
-map("n", "<leader>f", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true })
-map("n", "<leader>r", "<cmd>Telescope oldfiles<CR>", { noremap = true, silent = true })
-map("n", "<leader>b", "<cmd>Telescope buffers<CR>", { noremap = true, silent = true })
-map("n", "<C-f>", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { noremap = true, silent = true })
+map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 
--- Rename current file
+map("n", "<C-h>", "<C-w>h", { desc = "Window left" })
+map("n", "<C-j>", "<C-w>j", { desc = "Window down" })
+map("n", "<C-k>", "<C-w>k", { desc = "Window up" })
+map("n", "<C-l>", "<C-w>l", { desc = "Window right" })
+map("n", "<C-Up>", "<cmd>resize +2<CR>", { desc = "Grow window height" })
+map("n", "<C-Down>", "<cmd>resize -2<CR>", { desc = "Shrink window height" })
+map("n", "<C-Left>", "<cmd>vertical resize -2<CR>", { desc = "Shrink window width" })
+map("n", "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Grow window width" })
+
+map("v", "<", "<gv", { desc = "Indent left" })
+map("v", ">", ">gv", { desc = "Indent right" })
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+map("n", "J", "mzJ`z", { desc = "Join lines keep cursor" })
+map("n", "<C-d>", "<C-d>zz", { desc = "Page down centered" })
+map("n", "<C-u>", "<C-u>zz", { desc = "Page up centered" })
+map("n", "n", "nzzzv", { desc = "Next search centered" })
+map("n", "N", "Nzzzv", { desc = "Prev search centered" })
+
+map("n", "<C-p>", "<cmd>Telescope find_files<CR>", { noremap = true, silent = true })
+map("n", "<leader>f", "<cmd>Telescope live_grep<CR>", { noremap = true, silent = true, desc = "Live grep" })
+map("n", "<leader>r", "<cmd>Telescope oldfiles<CR>", { noremap = true, silent = true, desc = "Recent files" })
+map("n", "<leader>b", "<cmd>Telescope buffers<CR>", { noremap = true, silent = true, desc = "Buffers" })
+map("n", "<C-f>", "<cmd>Telescope current_buffer_fuzzy_find<CR>", { noremap = true, silent = true })
+map("n", "<C-S-f>", function()
+  require("telescope.builtin").live_grep()
+end, { noremap = true, silent = true, desc = "Search in project" })
+map("n", "<leader>ss", function()
+  require("telescope.builtin").lsp_document_symbols()
+end, { desc = "Document symbols" })
+map("n", "<leader>sS", function()
+  require("telescope.builtin").lsp_workspace_symbols()
+end, { desc = "Workspace symbols" })
+map("n", "<leader>xx", function()
+  require("telescope.builtin").diagnostics({ bufnr = 0 })
+end, { desc = "Buffer diagnostics" })
+map("n", "<leader>xX", function()
+  require("telescope.builtin").diagnostics()
+end, { desc = "Workspace diagnostics" })
+map("n", "<leader>gs", function()
+  require("telescope.builtin").git_status()
+end, { desc = "Git status" })
+
 map("n", "<leader>R", function()
-  local old_name = vim.fn.expand("%")
-  local new_name = vim.fn.input("Rename to: ", old_name)
-  if new_name ~= "" and new_name ~= old_name then
-    vim.fn.system({ "mv", old_name, new_name })
-    vim.cmd("e " .. new_name)
-    vim.cmd("bdelete " .. old_name)
-    print("Renamed to " .. new_name)
+  local old_name = vim.fn.expand("%:p")
+  if old_name == "" then
+    vim.notify("No file name", vim.log.levels.WARN)
+    return
   end
+
+  local new_name = vim.fn.input("Rename to: ", old_name)
+  if new_name == "" or new_name == old_name then
+    return
+  end
+
+  local ok, err = os.rename(old_name, new_name)
+  if not ok then
+    vim.notify("Rename failed: " .. tostring(err), vim.log.levels.ERROR)
+    return
+  end
+
+  vim.cmd.edit(vim.fn.fnameescape(new_name))
+  vim.cmd.bdelete(vim.fn.bufnr(old_name))
+  vim.notify("Renamed to " .. new_name)
 end, { desc = "Rename current file" })
 
--- Git-fugitive diff split
-map("n", "<leader>gd", ":Gdiffsplit<CR>", { noremap = true, silent = true })
--- lazygit (toggleterm float; see lua/lazygit_config.lua)
+map("n", "<leader>gd", ":Gdiffsplit<CR>", { noremap = true, silent = true, desc = "Git diff split" })
 map("n", "<leader>gg", function()
   require("lazygit_config").toggle()
 end, { noremap = true, silent = true, desc = "Toggle lazygit" })
+map("n", "<leader>dv", "<cmd>DiffviewOpen<CR>", { desc = "Diffview open" })
+map("n", "<leader>dh", "<cmd>DiffviewFileHistory %<CR>", { desc = "Diffview file history" })
+map("n", "<leader>dc", "<cmd>DiffviewClose<CR>", { desc = "Diffview close" })
 
--- Copy current file path to clipboard
 map("n", "<leader>cp", function()
   vim.fn.setreg("+", vim.fn.expand("%:p"))
+  vim.notify("Copied path")
 end, { desc = "Copy file path" })
 
--- Clipboard
 map("v", "<C-c>", '"+y', { noremap = true, silent = true })
 map("v", "<C-x>", '"+d', { noremap = true, silent = true })
 map("n", "<C-x>", '"+dd', { noremap = true, silent = true })
 map("n", "<C-v>", '"+p', { noremap = true, silent = true })
-map("i", "<C-v>", '<C-r>+', { noremap = true, silent = true })
+map("i", "<C-v>", "<C-r>+", { noremap = true, silent = true })
 
--- Buffer tabs (bufferline order — matches tab bar, not raw :bnext order)
 map("n", "<TAB>", "<cmd>BufferLineCycleNext<CR>", { noremap = true, silent = true, desc = "Next tab" })
 map("n", "<S-TAB>", "<cmd>BufferLineCyclePrev<CR>", { noremap = true, silent = true, desc = "Previous tab" })
 map("n", "<leader>0", "<cmd>BufferLineGoToBuffer -1<CR>", { noremap = true, silent = true, desc = "Last tab" })
@@ -51,26 +99,27 @@ for i = 1, 9 do
   )
 end
 map("n", "<leader>q", "<cmd>BDelete this<CR>", { noremap = true, silent = true, desc = "Close tab" })
+map("n", "<leader>Q", "<cmd>BDelete other<CR>", { noremap = true, silent = true, desc = "Close other tabs" })
 
--- Undo tree
 map("n", "<leader>u", "<cmd>UndotreeToggle<CR>", { noremap = true, silent = true, desc = "Toggle undo tree" })
 
--- Neo-tree (file explorer) — <leader>e = explorer only (no duplicate binding)
-map("n", "<leader>e", ":Neotree toggle left<CR>", { noremap = true, silent = true, desc = "Toggle file explorer" })
+map("n", "<leader>e", ":Neotree toggle left filesystem<CR>", { noremap = true, silent = true, desc = "Toggle explorer" })
+map("n", "<leader>eg", ":Neotree float git_status<CR>", { noremap = true, silent = true, desc = "Git status tree" })
+map("n", "<leader>eb", ":Neotree toggle left buffers<CR>", { noremap = true, silent = true, desc = "Buffers tree" })
+
 map("n", "<leader>df", function()
-  vim.diagnostic.open_float()
+  vim.diagnostic.open_float(nil, { focus = true, scope = "cursor" })
 end, { noremap = true, silent = true, desc = "Diagnostic float (line)" })
 map("n", "<leader>y", function()
   CopyLineDiagnostics()
 end, { noremap = true, silent = true, desc = "Yank line diagnostics" })
+map("n", "]d", function()
+  vim.diagnostic.jump({ count = 1, float = true })
+end, { noremap = true, silent = true, desc = "Next diagnostic" })
+map("n", "[d", function()
+  vim.diagnostic.jump({ count = -1, float = true })
+end, { noremap = true, silent = true, desc = "Prev diagnostic" })
 
-
--- Ctrl+Shift+F → Search text in project
-map("n", "<C-S-f>", function()
-  require("telescope.builtin").live_grep()
-end, { noremap = true, silent = true, desc = "Search in project" })
-
--- Toggleterm: Ctrl+\ then 1–9 toggles that terminal index (same float layout as toggleterm_config)
 for i = 1, 9 do
   map(
     { "n", "t" },
@@ -80,7 +129,6 @@ for i = 1, 9 do
   )
 end
 
--- Double Ctrl+\ closes the focused floating terminal (same chord family as <C-\>1–9)
 map({ "n", "t" }, "<C-\\><C-\\>", function()
   if vim.bo.filetype ~= "toggleterm" then
     return
@@ -91,7 +139,6 @@ map({ "n", "t" }, "<C-\\><C-\\>", function()
   end
 end, { noremap = true, silent = true, desc = "Close floating terminal" })
 
--- Open new floating terminal (extra instance; does not use the 1–9 slots)
 map("n", "<leader>n", function()
   require("toggleterm.terminal").Terminal:new({ direction = "float" }):toggle()
 end, { desc = "Open new floating terminal" })
@@ -118,3 +165,4 @@ map("n", "<leader>pp", function()
   require("telescope.builtin").find_files({ cwd = vim.fn.expand("$USERPROFILE/.cursor/plans") })
 end, { desc = "Open plans" })
 map("n", "<leader>pm", "<cmd>MarkdownPreviewToggle<CR>", { noremap = true, silent = true, desc = "Toggle markdown preview" })
+map("n", "<leader>sr", "<cmd>AutoSession restore<CR>", { desc = "Restore session" })
